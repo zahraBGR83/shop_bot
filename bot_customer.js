@@ -1,4 +1,5 @@
-
+import {InsertProduct} from './models/product.js'
+import {connectDB} from './Database/db.js'
 import dotenv from 'dotenv'
 dotenv.config()
 const TOKEN=process.env.TOKEN;
@@ -274,8 +275,8 @@ async function adminCallback (callback){
                 {
                   case 'ok':
                     {
-                      // database save
                       
+                      const save = await InsertProduct(result_map_callback.product)
                       console.log(`save product :`, result_map_callback.product)
                       await API('sendMessage',{
                         chat_id : chat_id,
@@ -354,10 +355,7 @@ async function adminCallback (callback){
   }
 
 }
-// ok & no
-// skip_photo
-// answerCallbackQuery
-//adminState.delete
+
 
 
 
@@ -367,6 +365,7 @@ async function main (){
 
   while(true){
     try{
+      await connectDB();
       const Updates = await API('getUpdates',{offset : offset , timeout :30})
       for(const update of Updates.result){
         offset = update.update_id + 1
