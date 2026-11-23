@@ -1,73 +1,17 @@
 import {InsertProduct} from './models/product.js'
-import {connectDB} from './Database/db.js'
+
+import {API} from './Robot/API.js'
 import dotenv from 'dotenv'
+import { customerPannel } from './Robot/customer.js'
 dotenv.config()
 const TOKEN=process.env.TOKEN;
 const address=`https://tapi.bale.ai/bot${TOKEN}`;
-let offset = 0;
+
 const adminState = new Map();
 
-//_______________base function for methods____________
-async function API (method , body ={}){
-  const response = await fetch (`${address}/${method}`,{
-    method : "POST",
-    headers : {'Content-Type':'application/json'},
-    body : JSON.stringify(body)
-  })
-  if(!response.ok){
-    throw new Error(`Http Error : ${response.status}`)
-  }
-  return response.json()
-}
 
-async function customerPannel(update){
 
-    const msg = update.message;
-    const callback = update.callback_query;
-
-    if(msg)
-    {
-    if(typeof(msg.text) === 'string')
-      {
-        switch(msg.text)
-        {
-          case '/start':
-          {
-            const res_start = await API ('sendMessage',{
-              chat_id : msg.chat.id,
-              text : `سلام _${msg.from.first_name}_ ، به فروشگاه ما خوش آمدید`,
-              reply_markup :{
-                inline_keyboard :[
-                  [{ text : 'سفارش های من' , callback_data : 'orders'},{text : 'مشاهده محصولات' , callback_data :'products'}],
-                  [{ text : 'ارتباط با مدیر' , callback_data : 'admin_call'},{text : 'جست‌وجوی محصول' , callback_data : 'search'}]
-                ]
-              }
-            })
-            console.log(res_start)
-            break;
-          }
-          case 'سلام':
-            {
-              const res_hi = await API ('sendMessage',{
-                chat_id : msg.chat.id,
-                text : `سلام *${msg.from.first_name}* `,
-              })
-              console.log(res_hi)
-              break;
-            }
-        }
-      }
-    }
-    if(callback)
-    {
-
-    }
-    
-    
-  
-}
-
-async function adminPannel(update){
+export async function adminPannel(update){
 
     const msg = update.message;
     const callback = update.callback_query;
@@ -359,40 +303,3 @@ async function adminCallback (callback){
 
 
 
-const admin = Number(process.env.ADMIN)
-async function main (){
-
-
-  while(true){
-    try{
-      await connectDB();
-      const Updates = await API('getUpdates',{offset : offset , timeout :30})
-      for(const update of Updates.result){
-        offset = update.update_id + 1
-        try
-        {
-          const chatId = update.message?.chat.id ?? update.callback_query?.message?.chat.id
-        if(chatId === admin){
-          await adminPannel(update);
-        
-          
-        }
-        else{
-          await customerPannel(update);
-        }
-        }
-        catch(error)
-        {
-          console.error(`Error processing update ${update.update_id} :` , error.message)
-        }
-      
-        
-      }
-    }
-    catch(error){
-      console.log(error.message)
-    }
-  }
-}
-
-main()
