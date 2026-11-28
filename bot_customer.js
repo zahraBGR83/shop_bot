@@ -1,11 +1,7 @@
 import {InsertProduct} from './models/product.js'
-
 import {API} from './Robot/API.js'
-import dotenv from 'dotenv'
-import { customerPannel } from './Robot/customer.js'
-dotenv.config()
-const TOKEN=process.env.TOKEN;
-const address=`https://tapi.bale.ai/bot${TOKEN}`;
+
+
 
 const adminState = new Map();
 

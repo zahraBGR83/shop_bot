@@ -41,9 +41,60 @@ export async function customerPannel(update){
     }
     if(callback)
     {
-
+      await custormer_callback(callback)
     }
     
     
   
 }
+
+async function custormer_callback (callback){
+  await API('answerCallbackQuery',{callback_query_id : callback.id}); // answer to callback for inline keyboard
+
+  switch (callback.data)
+  {
+    case 'products':
+      {
+      const products_answer= API('sendMessage' , { // return this to product callback data
+        chat_id : callback.message.chat.id,
+        text : 'لطفا دسته مورد نظر خود را انتخاب کنید',
+        reply_markup:{inline_keyboard :[
+          [{text : 'موبایل' , callback_data : 'mobile'}, {text : 'لپ تاپ' , callback_data : 'laptop'}],
+          [{text : 'لوازم جانبی' , callback_data : 'extra'} , {text : 'هدفون' , callback_data : 'headphone'}]
+        ]}
+      })
+      return products_answer
+      break;
+      }
+    case 'orders':
+      {
+        break;
+      }
+    case 'search':
+      {
+        break;
+      }
+    case 'admin_call':
+      {
+        break;
+      }
+    case 'mobile':
+      {
+        break;
+      }
+    case 'laptop' :
+      {
+        break;
+      }
+    case 'extra' : 
+      {
+        break;
+      }
+    case 'headphone':
+      {
+        break;
+      }
+  }
+}
+
+
